@@ -1,10 +1,15 @@
 'use strict';
 
+const babel = require('@rollup/plugin-babel').babel;
+const commonjs = require('@rollup/plugin-commonjs');
+const nodeResolve = require('@rollup/plugin-node-resolve').nodeResolve;
+const terser = require("rollup-plugin-terser").terser;
+
 const { src, dest } = require('gulp');
 const { paths } = require('./conf');
 
 const $ = require('gulp-load-plugins')({
-  pattern: ['gulp-*', 'rollup{,-*}']
+  pattern: ['gulp-*']
 });
 
 const scripts = () => {
@@ -12,16 +17,17 @@ const scripts = () => {
 
   const babelOptions = {
     presets: [['@babel/env']],
-    exclude: 'node_modules/**'
+    exclude: 'node_modules/**',
+    babelHelpers: "bundled"
   };
 
   const rollupPlugins = [
-    $.rollupPluginBabel(babelOptions),
-    $.rollupPluginNodeResolve(),
-    $.rollupPluginCommonjs()
+    babel(babelOptions),
+    nodeResolve(),
+    commonjs()
   ];
 
-  production && rollupPlugins.push($.rollupPluginTerser.terser());
+  production && rollupPlugins.push(terser());
 
   const injectFiles = src(paths.js.import, { read: false });
 
@@ -44,7 +50,7 @@ const scripts = () => {
     .pipe(production ? $.rename('scripts.min.js') : $.noop())
     .pipe(dest(paths.dist.include))
     .pipe(!production ? $.sourcemaps.init() : $.noop())
-    .pipe($.betterRollup({ plugins: rollupPlugins }, { format: 'iife' }))
+    .pipe($.bestRollup2({ plugins: rollupPlugins }, { format: 'iife' }))
     .pipe(!production ? $.sourcemaps.write('.') : $.noop())
     .pipe(dest(paths.dist.include))
     .pipe($.touchCmd());

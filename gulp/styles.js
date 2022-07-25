@@ -4,10 +4,10 @@ const { src, dest } = require('gulp');
 const { paths } = require('./conf');
 
 const $ = require('gulp-load-plugins')({
-  pattern: ['gulp-*', 'autoprefixer', 'cssnano', 'postcss-sort-media-queries']
+  pattern: ['gulp-*', 'autoprefixer', 'cssnano', 'postcss-sort-media-queries', "!gulp-sass"]
 });
 
-$.sass.compiler = require('node-sass');
+$.sass = require('gulp-sass')(require('sass'));
 
 const styles = () => {
   const production = process.env.NODE_ENV === 'production';
