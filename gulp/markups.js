@@ -25,6 +25,16 @@ const markups = () => {
 		quiet: true
 	};
 
+	var nunjucksFilter = function (environment) {
+		environment.addFilter("json", function (value, spaces) {
+			value.toString();
+			const jsonString = JSON.stringify(value, null, spaces).replace(/</g, "\\u003c");
+			return jsonString;
+		});
+	};
+
+	nunjucksOptions.manageEnv = nunjucksFilter;
+
 	const renameOptions = file => {
 		if (file.basename == 'index') return;
 		file.dirname = file.basename.split('_').join('/');
@@ -44,6 +54,8 @@ const markups = () => {
 
 		let output = {};
 		output.basePath = basePath;
+		output.isProduction = production;
+		output.branchName = branch;
 
     const filename = file.basename.split('.')[0];
     filename !== 'index' &&
